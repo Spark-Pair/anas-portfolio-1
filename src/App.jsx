@@ -15,6 +15,7 @@ function App() {
   const heroRef = useRef(null);
   const bearRef = useRef(null);
   const wordmarkRef = useRef(null);
+  const svgRef = useRef(null);
   const eyebrowRef = useRef(null);
 
   useEffect(() => {
@@ -35,7 +36,6 @@ function App() {
       image.src = src;
       return image;
     });
-
     const ctx = gsap.context(() => {
       const playhead = { frame: 0 };
 
@@ -46,82 +46,43 @@ function App() {
           bearRef.current.src = image.src;
         }
       };
-
+      
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: heroRef.current,
           start: "top top",
-          end: "+=600vh",
+          end: "+=1200vh",
           pin: true,
           scrub: 0.8,
         },
       });
 
-      /*
-      |--------------------------------------------------------------------------
-      | 1. BEAR FRAMES
-      | First 300vh of scrolling
-      |--------------------------------------------------------------------------
-      */
-      tl.to(
-        playhead,
-        {
-          frame: images.length - 1,
-          ease: "none",
-          snap: "frame",
-          duration: 300,
-          onUpdate: renderFrame,
-        },
-        0,
-      );
+      tl.to(playhead, {
+        frame: images.length - 1,
+        duration: 300,
+        ease: "none",
+        snap: "frame",
+        onUpdate: renderFrame,
+      }, 0);
 
-      /*
-      |--------------------------------------------------------------------------
-      | 2. BEAR MOVES OUT
-      | Starts AFTER all frames have finished
-      |--------------------------------------------------------------------------
-      */
-      tl.to(
-        bearRef.current,
-        {
-          xPercent: -150,
-          ease: "none",
-          duration: 300,
-        },
-        200,
-      );
+      tl.to(bearRef.current, {
+        xPercent: -150,
+        duration: 300,
+        ease: "none",
+      }, 300);
 
-      /*
-      |--------------------------------------------------------------------------
-      | 3. TEXT
-      | Starts at the SAME TIME as bear frame animation
-      |--------------------------------------------------------------------------
-      */
-      tl.to(
-        wordmarkRef.current,
-        {
-          xPercent: -56.7,
-          ease: "none",
-          duration: 600,
-        },
-        0,
-      );
+      tl.to(wordmarkRef.current, {
+        xPercent: -56.7,
+        duration: 600,
+        ease: "none",
+      }, 0);
 
-      /*
-      |--------------------------------------------------------------------------
-      | 4. EYEBROW
-      |--------------------------------------------------------------------------
-      */
-      // tl.to(
-      //   eyebrowRef.current,
-      //   {
-      //     y: -36,
-      //     opacity: 0.35,
-      //     ease: "none",
-      //     duration: 600,
-      //   },
-      //   0
-      // );
+      tl.to(svgRef.current, {
+        scale: 100,
+        rotate: 360,
+        duration: 600,
+        ease: "none",
+      }, 600);
 
       renderFrame();
     }, heroRef);
@@ -169,17 +130,8 @@ function App() {
               </div>
               <div className="canvas-container">
                 <div id="shape" className="shape">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 200 200"
-                    width="200"
-                    height="200"
-                  >
-                    <path
-                      d="M 100 10 C 104.950 10 118.635 30.453 118.635 30.453 C 118.635 30.453 140.713 19.583 145 22.058 C 149.287 24.533 150.912 49.088 150.912 49.088 C 150.912 49.088 175.467 50.713 177.942 55 C 180.417 59.287 169.547 81.365 169.547 81.365 C 169.547 81.365 190 95.050 190 100 C 190 104.950 169.547 118.635 169.547 118.635 C 169.547 118.635 180.417 140.713 177.942 145 C 175.467 149.287 150.912 150.912 150.912 150.912 C 150.912 150.912 149.287 175.467 145.000 177.942 C 140.713 180.417 118.635 169.547 118.635 169.547 C 118.635 169.547 104.950 190 100 190 C 95.050 190 81.365 169.547 81.365 169.547 C 81.365 169.547 59.287 180.417 55.000 177.942 C 50.713 175.467 49.088 150.912 49.088 150.912 C 49.088 150.912 24.533 149.287 22.058 145.000 C 19.583 140.713 30.453 118.635 30.453 118.635 C 30.453 118.635 10 104.950 10 100.000 C 10 95.050 30.453 81.365 30.453 81.365 C 30.453 81.365 19.583 59.287 22.058 55.000 C 24.533 50.713 49.088 49.088 49.088 49.088 C 49.088 49.088 50.713 24.533 55.000 22.058 C 59.287 19.583 81.365 30.453 81.365 30.453 C 81.365 30.453 95.050 10 100 10 Z"
-                      fill="#000000"
-                      stroke="none"
-                    />
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 112 110" width="110" height="110" aria-hidden="true" ref={svgRef}>
+                    <path d="M111.735,54.571c0,4.046-6.365,7.32-7.225,11.106-.889,3.908,3.4,9.615,1.7,13.141-1.729,3.583-8.885,3.775-11.342,6.855S93.8,95.781,90.7,98.252c-3.078,2.459-9.6-.455-13.19,1.275-3.525,1.7-5.305,8.635-9.213,9.524-3.785.861-8.387-4.6-12.432-4.6s-8.647,5.457-12.432,4.6c-3.908-.889-5.688-7.824-9.215-9.524-3.583-1.73-10.11 1.182-13.188-1.275-3.093-2.471-1.7-9.487-4.168-12.581C14.406 82.593 7.251 82.4 5.523 78.818c-1.7-3.526 2.591-9.234 1.7-13.141C6.365 61.891 0 58.617 0 54.571s6.365-7.32 7.225-11.106c.889-3.908-3.4-9.615-1.7-13.141 1.729-3.583 8.883-3.775 11.342-6.855s1.075-10.108 4.168-12.579c3.078-2.459 9.6.455 13.19-1.275C37.747 7.914 39.528.98 43.435.092c3.785-.861 8.387,4.6 12.432,4.6S64.515-.769 68.3.092c3.908.889 5.688,7.824 9.213,9.524C81.1 11.346 87.625 8.433 90.7 10.89c3.093,2.471 1.7,9.487 4.168,12.581 2.459,3.078 9.613,3.269 11.342,6.853 1.7,3.526-2.591,9.234-1.7,13.141.861,3.785 7.225,7.06 7.225,11.106" fill="#080808" />
                   </svg>
                 </div>
               </div>
@@ -191,7 +143,7 @@ function App() {
                   {Array.from({ length: 3 }).map((_, index) => (
                     <Fragment key={index}>
                       <p>
-                        WE ARE A <span>“BEARY”</span> CREATIVE DIGITAL AGENCY
+                        WE ARE A <span>â€œBEARYâ€</span> CREATIVE DIGITAL AGENCY
                         FOR HOOMANS
                       </p>
 
@@ -227,7 +179,7 @@ function App() {
             experiences with a little more bite.
           </p>
           <a className="text-link" href="#contact">
-            MEET THE BEARS <span>↗</span>
+            MEET THE BEARS <span>â†—</span>
           </a>
         </div>
       </section>
