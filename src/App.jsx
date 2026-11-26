@@ -17,6 +17,8 @@ function App() {
   const wordmarkRef = useRef(null);
   const svgRef = useRef(null);
   const canvasRef = useRef(null);
+  const maskDefinitionRef = useRef(null);
+  const maskStarRef = useRef(null);
   const eyebrowRef = useRef(null);
 
   useEffect(() => {
@@ -44,6 +46,10 @@ function App() {
 
       const { width, height } = canvas.getBoundingClientRect();
       const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+      maskDefinitionRef.current?.setAttribute(
+        "viewBox",
+        `0 0 ${window.innerWidth} ${window.innerHeight}`,
+      );
       canvas.width = Math.max(1, Math.round(width * pixelRatio));
       canvas.height = Math.max(1, Math.round(height * pixelRatio));
       canvasContext.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
@@ -65,14 +71,21 @@ function App() {
 
       const starScale = Number(gsap.getProperty(star, "scaleX")) || 1;
       const starRotation = Number(gsap.getProperty(star, "rotation")) || 0;
+      const starCenterX = starBounds.left + starBounds.width / 2;
+      const starCenterY = starBounds.top + starBounds.height / 2;
+
+      maskStarRef.current?.setAttribute(
+        "transform",
+        `translate(${starCenterX} ${starCenterY}) rotate(${starRotation}) scale(${starScale}) translate(-55.867 -54.571)`,
+      );
 
       canvasContext.setTransform(1, 0, 0, 1, 0, 0);
       canvasContext.clearRect(0, 0, canvas.width, canvas.height);
       canvasContext.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
       canvasContext.save();
       canvasContext.translate(
-        starBounds.left + starBounds.width / 2,
-        starBounds.top + starBounds.height / 2,
+        starCenterX,
+        starCenterY,
       );
       canvasContext.rotate((starRotation * Math.PI) / 180);
       canvasContext.scale(starScale, starScale);
@@ -175,6 +188,28 @@ function App() {
         </div>
         <div className="hero-pin">
           <canvas ref={canvasRef} className="hero-canvas" aria-hidden="true" />
+          <svg
+            ref={maskDefinitionRef}
+            className="hero-mask-definitions"
+            viewBox={`0 0 ${window.innerWidth} ${window.innerHeight}`}
+            aria-hidden="true"
+          >
+            <defs>
+              <mask
+                id="hero-page-mask"
+                x="0"
+                y="0"
+                width="100%"
+                height="100%"
+                maskUnits="userSpaceOnUse"
+                maskContentUnits="userSpaceOnUse"
+                maskType="luminance"
+              >
+                <rect x="0" y="0" width="100%" height="100%" fill="white" />
+                <use ref={maskStarRef} href="#hero-star-source" fill="black" />
+              </mask>
+            </defs>
+          </svg>
           <header className="site-header">
             <a className="brand" href="#top" aria-label="Bike Bear home">
               <img src="/images/logo.gif" alt="Bike Bear" />
@@ -208,7 +243,9 @@ function App() {
               <div className="canvas-container">
                 <div id="shape" className="shape">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 112 110" width="110" height="110" aria-hidden="true" ref={svgRef}>
+                    <g id="hero-star-source">
                     <path d="M111.735,54.571c0,4.046-6.365,7.32-7.225,11.106-.889,3.908,3.4,9.615,1.7,13.141-1.729,3.583-8.885,3.775-11.342,6.855S93.8,95.781,90.7,98.252c-3.078,2.459-9.6-.455-13.19,1.275-3.525,1.7-5.305,8.635-9.213,9.524-3.785.861-8.387-4.6-12.432-4.6s-8.647,5.457-12.432,4.6c-3.908-.889-5.688-7.824-9.215-9.524-3.583-1.73-10.11 1.182-13.188-1.275-3.093-2.471-1.7-9.487-4.168-12.581C14.406 82.593 7.251 82.4 5.523 78.818c-1.7-3.526 2.591-9.234 1.7-13.141C6.365 61.891 0 58.617 0 54.571s6.365-7.32 7.225-11.106c.889-3.908-3.4-9.615-1.7-13.141 1.729-3.583 8.883-3.775 11.342-6.855s1.075-10.108 4.168-12.579c3.078-2.459 9.6.455 13.19-1.275C37.747 7.914 39.528.98 43.435.092c3.785-.861 8.387,4.6 12.432,4.6S64.515-.769 68.3.092c3.908.889 5.688,7.824 9.213,9.524C81.1 11.346 87.625 8.433 90.7 10.89c3.093,2.471 1.7,9.487 4.168,12.581 2.459,3.078 9.613,3.269 11.342,6.853 1.7,3.526-2.591,9.234-1.7,13.141.861,3.785 7.225,7.06 7.225,11.106" fill="#080808" />
+                    </g>
                   </svg>
                 </div>
               </div>
